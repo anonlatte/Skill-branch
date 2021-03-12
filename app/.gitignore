@@ -1,6 +1,6 @@
 /build
 build.gradle
-src/androidTest
-src/test
-src/main/AndroidManifest.xml
-src/main/res
+/src/androidTest/
+/src/main/AndroidManifest.xml
+/src/main/res/
+/src/test/
