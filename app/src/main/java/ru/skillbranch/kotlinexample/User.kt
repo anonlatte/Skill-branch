@@ -19,7 +19,7 @@ class User(
         lastName: String?,
         email: String,
         password: String
-    ) : this(firstName, lastName, email, meta = mapOf("auth" to password)) {
+    ) : this(firstName, lastName, email, meta = mapOf("auth" to "password")) {
         passwordHash = encrypt(password)
     }
 
@@ -29,7 +29,6 @@ class User(
         rawPhone: String
     ) : this(firstName, lastName, rawPhone = rawPhone, meta = mapOf("auth" to "sms")) {
         val code = generateAccessCode()
-        passwordHash = encrypt(code)
         accessCode = code
         sendAccessCodeToUser(rawPhone, code)
     }
@@ -59,11 +58,17 @@ class User(
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     var accessCode: String? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                passwordHash = encrypt(value)
+            }
+        }
     val userInfo: String
 
     init {
         check(firstName.isNotBlank()) { "FirstName must not be blank" }
-        check(!email.isNullOrBlank() || rawPhone.isNullOrBlank()) {
+        check(!email.isNullOrBlank() || !rawPhone.isNullOrBlank()) {
             "Email or phone must not be null or blank"
         }
 
@@ -83,10 +88,10 @@ class User(
     }
 
     private fun sendAccessCodeToUser(rawPhone: String, code: String) {
-        print("$code ---> $rawPhone")
+        println("$code ---> $rawPhone")
     }
 
-    private fun generateAccessCode(): String = (0..5).map {
+    fun generateAccessCode(): String = (0..5).map {
         POSSIBLE_CHARS.random()
     }.joinToString("")
 
@@ -97,7 +102,10 @@ class User(
         return salt.plus(password).md5()
     }
 
-    fun checkPassword(pass: String) = encrypt(pass) == passwordHash
+    fun checkPassword(pass: String): Boolean {
+        println("Checking passwordHash is $passwordHash")
+        return encrypt(pass) == passwordHash
+    }
 
     fun changePassword(oldPass: String, newPass: String) {
         if (checkPassword(oldPass)) {
@@ -105,6 +113,7 @@ class User(
             if (!accessCode.isNullOrEmpty()) {
                 accessCode = newPass
             }
+            println("Password $oldPass has been change to $newPass")
         } else {
             throw IllegalArgumentException(
                 "The entered password doesn't match the current password"
@@ -113,6 +122,9 @@ class User(
     }
 
     companion object Factory {
+        private const val POSSIBLE_CHARS =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
         fun makeUser(
             fullName: String,
             email: String? = null,
@@ -148,6 +160,3 @@ class User(
         return hexString.padStart(32, '0')
     }
 }
-
-const val POSSIBLE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
