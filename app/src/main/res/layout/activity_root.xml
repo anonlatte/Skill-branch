@@ -48,6 +48,7 @@
         android:elevation="8dp"
         android:theme="@style/ArticleBarsTheme"
         android:visibility="gone"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_dodgeInsetEdges="bottom"
         tools:visibility="visible" />
 
