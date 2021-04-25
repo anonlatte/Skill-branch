@@ -18,7 +18,7 @@ class SubmenuBehavior : CoordinatorLayout.Behavior<ArticleSubmenu>() {
         child: ArticleSubmenu,
         dependency: View
     ): Boolean {
-        return if (dependency is Bottombar && dependency.translationY >= 0) {
+        return if (child.isOpen && dependency is Bottombar && dependency.translationY >= 0) {
             animate(child, dependency)
         } else {
             false
