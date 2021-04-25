@@ -18,11 +18,12 @@ class ArticleViewModel(
         subscribeOnDataSource(getArticleData()) { newValue, currentState ->
             newValue ?: return@subscribeOnDataSource null
             currentState.copy(
-                shareLink = newValue.shareLink,
-                title = newValue.title,
+                author = newValue.author,
                 category = newValue.category,
                 categoryIcon = newValue.categoryIcon,
-                date = newValue.date.format()
+                date = newValue.date.format(),
+                shareLink = newValue.shareLink,
+                title = newValue.title
             )
         }
         subscribeOnDataSource(getArticleContent()) { newValue, currentState ->
@@ -90,7 +91,7 @@ class ArticleViewModel(
             Notify.TextMessage("Mark is liked")
         } else {
             Notify.ActionMessage(
-                "Don't like it anymore",
+                "Don`t like it anymore",
                 "No, still like it",
                 toggleLike
             )
