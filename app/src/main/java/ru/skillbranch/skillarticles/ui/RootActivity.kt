@@ -1,17 +1,18 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toolbar
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat.getDrawable
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_root.*
-import kotlinx.android.synthetic.main.layout_bottombar.*
-import kotlinx.android.synthetic.main.layout_submenu.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.databinding.ActivityRootBinding
+import ru.skillbranch.skillarticles.databinding.LayoutBottombarBinding
+import ru.skillbranch.skillarticles.databinding.LayoutSubmenuBinding
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
@@ -20,17 +21,22 @@ import ru.skillbranch.skillarticles.viewmodels.ViewModelFactory
 
 class RootActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ArticleViewModel
+    private val viewModel: ArticleViewModel by viewModels { ViewModelFactory("0") }
+    private lateinit var binding: ActivityRootBinding
+    private val bindingBottomBar: LayoutBottombarBinding
+        get() = binding.bottombar.binding
+    private val bindingSubMenu: LayoutSubmenuBinding
+        get() = binding.submenu.binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_root)
+        binding = ActivityRootBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         setupToolbar()
         setupBottombar()
         setupSubmenu()
 
-        val vmFactory = ViewModelFactory("0")
-        viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
         viewModel.observeState(this) {
             renderUi(it)
             setupToolbar()
@@ -42,62 +48,68 @@ class RootActivity : AppCompatActivity() {
     }
 
     private fun setupSubmenu() {
-        btn_text_up.setOnClickListener { viewModel.handleUpText() }
-        btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode() }
+        with(bindingSubMenu) {
+            btnTextUp.setOnClickListener { viewModel.handleUpText() }
+            btnTextDown.setOnClickListener { viewModel.handleDownText() }
+            switchMode.setOnClickListener { viewModel.handleNightMode() }
+        }
     }
 
     private fun setupBottombar() {
-        btn_like.setOnClickListener { viewModel.handleLike() }
-        btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
-        btn_share.setOnClickListener { viewModel.handleShare() }
-        btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+        with(bindingBottomBar) {
+            btnLike.setOnClickListener { viewModel.handleLike() }
+            btnBookmark.setOnClickListener { viewModel.handleBookmark() }
+            btnShare.setOnClickListener { viewModel.handleShare() }
+            btnSettings.setOnClickListener { viewModel.handleToggleMenu() }
+        }
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        (toolbar.getChildAt(2) as? ImageView)?.let { logo ->
-            logo.scaleType = ImageView.ScaleType.CENTER_CROP
-            (logo.layoutParams as? Toolbar.LayoutParams)?.let {
-                it.width = dpToIntPx(40)
-                it.height = dpToIntPx(40)
-                it.marginEnd = dpToIntPx(16)
-                logo.layoutParams = it
+        with(binding) {
+            setSupportActionBar(toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            (toolbar.getChildAt(2) as? ImageView)?.let { logo ->
+                logo.scaleType = ImageView.ScaleType.CENTER_CROP
+                (logo.layoutParams as? Toolbar.LayoutParams)?.let {
+                    it.width = dpToIntPx(40)
+                    it.height = dpToIntPx(40)
+                    it.marginEnd = dpToIntPx(16)
+                    logo.layoutParams = it
+                }
             }
         }
     }
 
     private fun renderUi(data: ArticleState) {
-        btn_settings.isChecked = data.isShowMenu
-        if (data.isShowMenu) submenu.open() else submenu.close()
+        bindingBottomBar.btnSettings.isChecked = data.isShowMenu
+        if (data.isShowMenu) binding.submenu.open() else binding.submenu.close()
 
-        btn_like.isChecked = data.isLike
-        btn_bookmark.isChecked = data.isBookmark
+        bindingBottomBar.btnLike.isChecked = data.isLike
+        bindingBottomBar.btnBookmark.isChecked = data.isBookmark
 
-        switch_mode.isChecked = data.isDarkMode
+        bindingSubMenu.switchMode.isChecked = data.isDarkMode
         delegate.localNightMode = if (data.isDarkMode) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         if (data.isBigText) {
-            tv_text_content.textSize = 18f
-            btn_text_up.isChecked = true
-            btn_text_down.isChecked = false
+            binding.tvTextContent.textSize = 18f
+            bindingSubMenu.btnTextUp.isChecked = true
+            bindingSubMenu.btnTextDown.isChecked = false
         } else {
-            tv_text_content.textSize = 14f
-            btn_text_up.isChecked = false
-            btn_text_down.isChecked = true
+            binding.tvTextContent.textSize = 14f
+            bindingSubMenu.btnTextUp.isChecked = false
+            bindingSubMenu.btnTextDown.isChecked = true
         }
 
-        tv_text_content.text = if (data.isLoadingContent) {
+        binding.tvTextContent.text = if (data.isLoadingContent) {
             "loading"
         } else {
             data.content.first() as String
         }
 
-        toolbar.apply {
+        binding.toolbar.apply {
             title = data.title ?: "Skill Articles"
             subtitle = data.category ?: "loading..."
             if (data.categoryIcon != null) {
@@ -107,11 +119,12 @@ class RootActivity : AppCompatActivity() {
     }
 
     private fun renderNotification(notify: Notify) {
+        @SuppressLint("ShowToast")
         val snackbar = Snackbar.make(
-            coordinator_container,
+            binding.coordinatorContainer,
             notify.message,
             Snackbar.LENGTH_LONG
-        ).setAnchorView(bottombar)
+        ).setAnchorView(binding.bottombar)
         when (notify) {
             is Notify.ActionMessage -> {
                 snackbar.setTextColor(getColor(R.color.color_accent_dark))
