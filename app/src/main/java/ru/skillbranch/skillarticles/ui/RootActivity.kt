@@ -30,7 +30,7 @@ import ru.skillbranch.skillarticles.viewmodels.*
 
 class RootActivity : AppCompatActivity(), IArticleView {
 
-    private val viewModel: ArticleViewModel by viewModels { ViewModelFactory("0") }
+    private val viewModel: ArticleViewModel by viewModels { ViewModelFactory(this, "0") }
     private val binding: ActivityRootBinding by viewBinding(ActivityRootBinding::inflate)
     private val bindingBottomBar get() = binding.bottombar.binding
     private val bindingSubMenu get() = binding.submenu.binding
@@ -93,6 +93,11 @@ class RootActivity : AppCompatActivity(), IArticleView {
         })
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveState()
+        super.onSaveInstanceState(outState)
     }
 
     override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
@@ -218,15 +223,9 @@ class RootActivity : AppCompatActivity(), IArticleView {
 
         with(binding.tvTextContent) {
             textSize = if (data.isBigText) 18f else 14f
-            setText(
-                if (data.isLoadingContent) {
-                    "loading"
-                } else {
-                    data.content.first()
-                },
-                TextView.BufferType.SPANNABLE
-            )
+            val content = if (data.isLoadingContent) "loading" else data.content.first()
             movementMethod = ScrollingMovementMethod()
+            if (text.toString() != content) setText(content, TextView.BufferType.SPANNABLE)
         }
 
         bindingBottomBar.btnLike.isChecked = data.isLike

@@ -1,6 +1,8 @@
 package ru.skillbranch.skillarticles.ui.custom
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewAnimationUtils
@@ -29,6 +31,21 @@ class Bottombar @JvmOverloads constructor(
     }
 
     override fun getBehavior(): CoordinatorLayout.Behavior<*> = BottombarBehavior()
+
+    override fun onSaveInstanceState(): Parcelable {
+        val savedState = SavedState(super.onSaveInstanceState())
+        savedState.ssIsSearchMode = isSearchMode
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        if (state is SavedState) {
+            isSearchMode = state.ssIsSearchMode
+            binding.reveal.isVisible = isSearchMode
+            binding.bottomGroup.isVisible = !isSearchMode
+        }
+    }
 
     fun setSearchState(isSearch: Boolean) {
         if (isSearch == isSearchMode || !isAttachedToWindow) return
@@ -80,5 +97,27 @@ class Bottombar @JvmOverloads constructor(
         )
         animator.doOnEnd { binding.reveal.isVisible = false }
         animator.start()
+    }
+
+    private class SavedState : BaseSavedState, Parcelable {
+        var ssIsSearchMode: Boolean = false
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        constructor(parcel: Parcel) : super(parcel) {
+            ssIsSearchMode = parcel.readByte() != 0.toByte()
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            super.writeToParcel(parcel, flags)
+            parcel.writeByte(if (ssIsSearchMode) 1 else 0)
+        }
+
+        override fun describeContents(): Int = 0
+
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel): SavedState = SavedState(parcel)
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+        }
     }
 }
