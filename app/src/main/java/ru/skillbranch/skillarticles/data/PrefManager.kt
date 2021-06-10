@@ -43,5 +43,12 @@ class PrefManager(context: Context = App.applicationContext()) {
     internal val scope = CoroutineScope(SupervisorJob() + exceptionHandler)
     var isBigText by PrefDelegate(false)
     var isDarkMode by PrefDelegate(false)
+
+    var testBoolean: Boolean = false
+    var testDouble: Double = Double.MAX_VALUE
+    var testString: String = "test"
+    var testFloat: Float = Float.MAX_VALUE
+    var testInt: Int = Int.MAX_VALUE
+    var testLong: Long = Long.MAX_VALUE
 }
 
