@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.extensions.data
+package ru.skillbranch.skillarticles.data
 
 import android.content.Context
 import android.util.Log
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.zip
 import ru.skillbranch.skillarticles.App
-import ru.skillbranch.skillarticles.data.AppSettings
 import ru.skillbranch.skillarticles.data.delegates.PrefDelegate
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")

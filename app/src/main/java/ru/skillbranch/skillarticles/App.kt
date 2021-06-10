@@ -3,7 +3,7 @@ package ru.skillbranch.skillarticles
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import ru.skillbranch.skillarticles.extensions.data.PrefManager
+import ru.skillbranch.skillarticles.data.PrefManager
 
 class App : Application() {
     init {

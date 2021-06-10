@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import ru.skillbranch.skillarticles.extensions.data.PrefManager
+import ru.skillbranch.skillarticles.data.PrefManager
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

@@ -4,12 +4,9 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import ru.skillbranch.skillarticles.data.ArticleData
-import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.*
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.asMap
-import ru.skillbranch.skillarticles.extensions.data.toAppSettings
-import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
 
@@ -236,6 +233,9 @@ data class SubmenuData(
     val isDarkMode: Boolean = false
 )
 
+fun ArticleState.toAppSettings() = AppSettings(isDarkMode, isBigText)
+fun ArticleState.toArticlePersonalInfo() = ArticlePersonalInfo(isLike, isBookmark)
+fun ArticleState.toSubmenuData() = SubmenuData(isShowMenu, isBigText, isDarkMode)
 fun ArticleState.toBottombarData() = BottombarData(
     isLike,
     isBookmark,
@@ -244,5 +244,3 @@ fun ArticleState.toBottombarData() = BottombarData(
     searchResults.size,
     searchPosition
 )
-
-fun ArticleState.toSubmenuData() = SubmenuData(isShowMenu, isBigText, isDarkMode)

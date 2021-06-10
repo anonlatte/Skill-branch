@@ -2,7 +2,6 @@ package ru.skillbranch.skillarticles.data.repositories
 
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.*
-import ru.skillbranch.skillarticles.extensions.data.PrefManager
 
 class ArticleRepository(
     private val local: LocalDataHolder = LocalDataHolder,
