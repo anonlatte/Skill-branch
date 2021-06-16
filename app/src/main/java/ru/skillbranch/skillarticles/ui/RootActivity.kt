@@ -167,10 +167,12 @@ class RootActivity : AppCompatActivity(), IArticleView {
             btnSettings.setOnClickListener { viewModel.handleToggleMenu() }
             btnResultUp.setOnClickListener {
                 searchView.clearFocus()
+                binding.tvTextContent.requestFocus()
                 viewModel.handleUpResult()
             }
             btnResultDown.setOnClickListener {
                 searchView.clearFocus()
+                binding.tvTextContent.requestFocus()
                 viewModel.handleDownResult()
             }
             btnSearchClose.setOnClickListener {
