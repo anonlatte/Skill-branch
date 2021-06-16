@@ -1,7 +1,7 @@
 package ru.skillbranch.skillarticles.extensions
 
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import android.view.ViewGroup
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
@@ -13,7 +13,7 @@ fun View.setMarginOptionally(
     right: Int = marginRight,
     bottom: Int = marginBottom
 ) {
-    layoutParams = CoordinatorLayout.LayoutParams(layoutParams).apply {
+    layoutParams = (layoutParams as ViewGroup.MarginLayoutParams).apply {
         setMargins(left, top, right, bottom)
     }
 }
