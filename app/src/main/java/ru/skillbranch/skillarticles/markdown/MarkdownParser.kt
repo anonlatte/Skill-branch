@@ -29,8 +29,8 @@ object MarkdownParser {
         return MarkdownText(elements)
     }
 
-    fun clear(string: String): String? {
-        return null
+    fun clear(string: String): String = parse(string).elements.joinToString("") {
+        if (it is Element.Text) it.text else it.text.replace(Regex("[_~*]"), "")
     }
 
     private fun findElements(string: CharSequence): List<Element> {
