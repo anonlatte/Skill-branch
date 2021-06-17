@@ -231,7 +231,6 @@ sealed class Element {
     data class Image(
         val alt: String?,
         val url: String,
-        val title: String?,
         override val text: CharSequence = " ",
         override val elements: List<Element> = emptyList()
     ) : Element()
