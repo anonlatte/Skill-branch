@@ -122,7 +122,10 @@ object MarkdownParser {
                 10 -> {
                     text = string.subSequence(startIndex.plus(3), endIndex)
                     val subs = findElements(text)
-                    val element = Element.OrderedListItem(text, subs)
+                    val order = string.subSequence(startIndex, endIndex).let { sequence ->
+                        sequence.substring(0, sequence.indexOfLast { !it.isLetter() })
+                    }
+                    val element = Element.OrderedListItem(order, text, subs)
                     parents.add(element)
                     lastStartIndex = endIndex
                 }
@@ -215,6 +218,7 @@ sealed class Element {
     ) : Element()
 
     data class OrderedListItem(
+        val order: String,
         override val text: CharSequence,
         override val elements: List<Element> = emptyList()
     ) : Element()
