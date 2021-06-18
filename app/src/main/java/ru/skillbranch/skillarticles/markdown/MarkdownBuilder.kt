@@ -3,6 +3,7 @@ package ru.skillbranch.skillarticles.markdown
 import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
+import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -38,7 +39,11 @@ class MarkdownBuilder(context: Context) {
     ): CharSequence = builder.apply {
         when (element) {
             // is Element.BlockCode -> {}
-            // is Element.Bold -> {}
+            is Element.Bold -> {
+                inSpans(StyleSpan(Typeface.BOLD)) {
+                    element.elements.forEach { buildElement(it, builder) }
+                }
+            }
             is Element.Header -> {
                 inSpans(
                     HeaderSpan(
@@ -54,7 +59,11 @@ class MarkdownBuilder(context: Context) {
             }
             // is Element.Image -> {}
             // is Element.InlineCode -> {}
-            // is Element.Italic -> {}
+            is Element.Italic -> {
+                inSpans(StyleSpan(Typeface.ITALIC)) {
+                    element.elements.forEach { buildElement(it, builder) }
+                }
+            }
             // is Element.Link -> {}
             // is Element.OrderedListItem -> {}
             is Element.Quote -> {
@@ -66,7 +75,11 @@ class MarkdownBuilder(context: Context) {
                 }
             }
             // is Element.Rule -> {}
-            // is Element.Strike -> {}
+            is Element.Strike -> {
+                inSpans(StrikethroughSpan()) {
+                    element.elements.forEach { buildElement(it, builder) }
+                }
+            }
             is Element.Text -> {
                 append(element.text)
             }
