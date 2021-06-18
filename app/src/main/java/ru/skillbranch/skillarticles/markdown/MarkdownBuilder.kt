@@ -5,6 +5,8 @@ import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
+import android.text.style.URLSpan
+import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import ru.skillbranch.skillarticles.R
@@ -17,8 +19,7 @@ class MarkdownBuilder(context: Context) {
     private val colorPrimary = context.attrValue(R.attr.colorPrimary)
     private val colorOnSurface = context.attrValue(R.attr.colorOnSurface)
     private val colorSurface = context.attrValue(R.attr.colorSurface)
-
-    // private val opacityColorSurface = context.getColor(R.color.opacity_color_surface)
+    private val opacityColorSurface = context.getColor(R.color.opacity_color_surface)
     private val colorDivider = context.getColor(R.color.color_divider)
     private val gap: Float = context.dpToPx(8)
     private val bulletRadius: Float = context.dpToPx(4)
@@ -27,7 +28,7 @@ class MarkdownBuilder(context: Context) {
     private val headerMarginBottom: Float = context.dpToPx(8)
     private val ruleWidth: Float = context.dpToPx(2)
     private val cornerRadius: Float = context.dpToPx(8)
-    // private val linkIcon = getDrawable(context, R.drawable.ic_ba)
+    private val linkIcon = getDrawable(context, R.drawable.ic_baseline_link_24)!!
 
     fun markdownToSpan(content: String) = buildSpannedString {
         MarkdownParser.parse(content).elements.forEach { buildElement(it, this) }
@@ -59,7 +60,7 @@ class MarkdownBuilder(context: Context) {
             // is Element.Image -> {}
             is Element.InlineCode -> {
                 inSpans(
-                    InlineCodeSpan(colorOnSurface, colorSurface, cornerRadius, gap),
+                    InlineCodeSpan(colorOnSurface, opacityColorSurface, cornerRadius, gap),
                 ) {
                     append(element.text)
                 }
@@ -69,7 +70,14 @@ class MarkdownBuilder(context: Context) {
                     element.elements.forEach { buildElement(it, builder) }
                 }
             }
-            // is Element.Link -> {}
+            is Element.Link -> {
+                inSpans(
+                    IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth),
+                    URLSpan(element.link)
+                ) {
+                    append(element.text)
+                }
+            }
             // is Element.OrderedListItem -> {}
             is Element.Quote -> {
                 inSpans(
