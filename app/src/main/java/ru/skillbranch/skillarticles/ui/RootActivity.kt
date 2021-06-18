@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
-import android.text.method.ScrollingMovementMethod
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -24,6 +24,7 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.databinding.ActivityRootBinding
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.markdown.MarkdownBuilder
 import ru.skillbranch.skillarticles.ui.custom.SearchFocusSpan
 import ru.skillbranch.skillarticles.ui.custom.SearchSpan
 import ru.skillbranch.skillarticles.ui.delegates.AttrValue
@@ -229,9 +230,10 @@ class RootActivity : AppCompatActivity(), IArticleView {
 
         with(binding.tvTextContent) {
             textSize = if (data.isBigText) 18f else 14f
-            val content = if (data.isLoadingContent) "loading" else data.content.first()
-            movementMethod = ScrollingMovementMethod()
-            if (text.toString() != content) setText(content, TextView.BufferType.SPANNABLE)
+            movementMethod = LinkMovementMethod()
+            MarkdownBuilder(context)
+                .markdownToSpan(data.content)
+                .run { setText(this, TextView.BufferType.SPANNABLE) }
         }
 
         bindingBottomBar.btnLike.isChecked = data.isLike
