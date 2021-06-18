@@ -12,6 +12,7 @@ import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToPx
 import ru.skillbranch.skillarticles.markdown.spans.BlockquotesSpan
 import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
+import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
 import ru.skillbranch.skillarticles.markdown.spans.UnorderedListSpan
 
 class MarkdownBuilder(context: Context) {
@@ -74,7 +75,13 @@ class MarkdownBuilder(context: Context) {
                     element.elements.forEach { buildElement(it, builder) }
                 }
             }
-            // is Element.Rule -> {}
+            is Element.Rule -> {
+                inSpans(
+                    HorizontalRuleSpan(ruleWidth, colorDivider),
+                ) {
+                    append(element.text)
+                }
+            }
             is Element.Strike -> {
                 inSpans(StrikethroughSpan()) {
                     element.elements.forEach { buildElement(it, builder) }

@@ -7,10 +7,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 
 class HorizontalRuleSpan(
-    @Px
-    val ruleWidth: Float,
-    @ColorInt
-    val ruleColor: Int
+    @Px val ruleWidth: Float,
+    @ColorInt val ruleColor: Int
 ) : ReplacementSpan() {
 
     override fun getSize(
@@ -19,10 +17,7 @@ class HorizontalRuleSpan(
         start: Int,
         end: Int,
         fm: Paint.FontMetricsInt?
-    ): Int {
-        //TODO implement me
-        return 0
-    }
+    ): Int = 0
 
     override fun draw(
         canvas: Canvas,
@@ -35,10 +30,27 @@ class HorizontalRuleSpan(
         bottom: Int,
         paint: Paint
     ) {
-        //TODO implement me
+        paint.forLine {
+            canvas.drawLine(
+                0f,
+                (top + bottom) / 2f,
+                canvas.width.toFloat(),
+                (top + bottom) / 2f,
+                paint
+            )
+        }
     }
 
     private inline fun Paint.forLine(block: () -> Unit) {
-        //TODO implement me
+        val oldColor = color
+        val oldStyle = style
+        val oldWidth = strokeWidth
+        color = ruleColor
+        style = Paint.Style.STROKE
+        strokeWidth = ruleWidth
+        block()
+        color = oldColor
+        style = oldStyle
+        strokeWidth = oldWidth
     }
 }
