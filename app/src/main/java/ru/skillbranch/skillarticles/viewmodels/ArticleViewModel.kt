@@ -6,7 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import ru.skillbranch.skillarticles.data.*
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
-import ru.skillbranch.skillarticles.data.repositories.MarkdownParser
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
+import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.extensions.asMap
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
@@ -54,7 +55,7 @@ class ArticleViewModel(
         }
     }
 
-    override fun getArticleContent(): LiveData<String?> {
+    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
         return repository.loadArticleContent(articleId)
     }
 
@@ -146,7 +147,9 @@ class ArticleViewModel(
 
     override fun handleSearch(query: String?) {
         query ?: return
-        if (clearContent == null) clearContent = MarkdownParser.clear(currentState.content)
+        if (clearContent == null && currentState.content.isNotEmpty()) {
+            clearContent = currentState.content.clearContent()
+        }
         val result = clearContent.indexesOf(query).map { it to it + query.length }
         updateState { it.copy(searchQuery = query, searchResults = result) }
     }
@@ -180,11 +183,11 @@ data class ArticleState(
     val date: String? = null,
     val author: Any? = null,
     val poster: String? = null,
-    val content: String = "Loading",
+    val content: List<MarkdownElement> = emptyList(),
     val reviews: List<Any> = emptyList()
 ) : VMState {
     override fun toBundle(): Bundle {
-        val map = copy(content = "Loading", isLoadingContent = true)
+        val map = copy(content = emptyList(), isLoadingContent = true)
             .asMap()
             .toList()
             .toTypedArray()
@@ -213,7 +216,7 @@ data class ArticleState(
             date = map["date"] as String?,
             author = map["author"] as Any?,
             poster = map["poster"] as String?,
-            content = map["content"] as String,
+            content = map["content"] as List<MarkdownElement>,
             reviews = map["reviews"] as List<Any>,
         )
     }
